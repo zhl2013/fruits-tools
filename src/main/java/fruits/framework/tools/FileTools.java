@@ -9,10 +9,17 @@ package fruits.framework.tools;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
+
+import fruits.framework.tools.image.PhotoTools;
 
 /**
  * @FileTools.java
@@ -95,8 +102,11 @@ public class FileTools extends FileUtils {
 
 	public static void main(String[] args) {
 //		File file = FileTools.getFile("F:/.tmp/照片/尼康/DCIM/101NIKON/DSCN3043.JPG");
-		File inputDir = FileTools.getFile("F:/.tmp/照片/尼康/DCIM");
-		File outputDir = inputDir.getParentFile();
+//		File inputDir = FileTools.getFile("G:/微云/253587517/pad air/我的照片流");
+//		File outputDir = FileTools.getFile("G:/微云/253587517/pad air/2014-我的照片流");
+		File inputDir = FileTools.getFile("G:/微云/253587517/尼康相机");
+		File outputDir = FileTools.getFile("G:/微云/253587517/尼康相机_a");
+//		File outputDir = inputDir.getParentFile();
 		try {
 			FileTools.splitContents(inputDir, outputDir);
 		} catch (IOException e) {
@@ -113,11 +123,24 @@ public class FileTools extends FileUtils {
 interface SpliteHandler {
 	public void splite(File file,File outputFile)throws IOException;
 }
-
+ 
 class SpliteByYearMouthHandler implements SpliteHandler{
 	@Override
 	public void splite(File file, File outputFile) throws IOException {
 		long modifiedTime = file.lastModified();
+		
+		String shootTime = PhotoTools.getShootingTime(file);
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
+		try {
+			modifiedTime = sdf.parse(shootTime).getTime();
+		} catch (Exception e) {
+			System.out.println(shootTime);
+			System.out.println(file.getName());
+			e.printStackTrace();
+		}
+//		DateUtils.parseDate(str, parsePatterns)
+		
 		FastDateFormat dataFormat =  FastDateFormat.getInstance("yyyy"+File.separator+"yyyy-MM");
 		String dt = dataFormat.format(modifiedTime);
 		String path = outputFile.getPath() + File.separator + dt;
